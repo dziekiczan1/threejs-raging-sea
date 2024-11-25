@@ -3,6 +3,12 @@ uniform float uBigWavesElevation;
 uniform vec2 uBigWavesFrequency;
 uniform float uBigWavesSpeed;
 
+uniform float uSmallWavesElevation;
+uniform float uSmallWavesFrequency;
+uniform float uSmallWavesSpeed;
+uniform float uSmallWavesIterations;
+
+
 varying float vElevation;
 
 vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
@@ -85,7 +91,9 @@ void main() {
                       sin(modelPosition.z * uBigWavesFrequency.y + uTime * uBigWavesSpeed) *
                       uBigWavesElevation;
 
-    elevation += cnoise(vec3(modelPosition.xz * 3.0, uTime * 0.2)) * 0.15;
+    for (float i = 1.0; i <= uSmallWavesIterations; i++) {
+        elevation -= abs(cnoise(vec3(modelPosition.xz * uSmallWavesFrequency * i, uTime * uSmallWavesSpeed)) * uBigWavesElevation / i);
+    }
     modelPosition.y += elevation;
 
     vec4 viewPosition = viewMatrix * modelPosition;
